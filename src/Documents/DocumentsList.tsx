@@ -1,5 +1,4 @@
 import ListsLayout from "@/components/layouts/ListsLayout";
-import { useState } from "react";
 import {
   DataTable,
   TypeBadge,
@@ -8,71 +7,73 @@ import {
   type FilterTab,
 } from "@/components";
 import { useNavigate } from "react-router";
+import type { Transaction } from "@/lib/types";
+import { format } from "date-fns";
+import { formatTimeTo12Hour } from "@/lib/utils";
+import { useQuery } from "@tanstack/react-query";
+import { getDocumentQueryOptions } from "@/api/query";
+import { useFilterContext } from "@/contexts/Filter/useFilterContext";
+import { filterTypes } from "@/lib/constants";
 
-type Document = {
-  code: string;
-  time: string;
-  date: string;
-  type: "Out stock" | "Withdraw" | "Sales" | "Return" | "In stock";
-};
-
-const documents: Document[] = [
-  { code: "6754", time: "06:00PM", date: "29/05", type: "Out stock" },
-  { code: "6754", time: "05:55PM", date: "29/05", type: "Withdraw" },
-  { code: "6754", time: "04:50PM", date: "29/05", type: "Sales" },
-  { code: "6754", time: "04:25PM", date: "29/05", type: "Return" },
-  { code: "6754", time: "02:01PM", date: "29/05", type: "Sales" },
-  { code: "6754", time: "01:40PM", date: "29/05", type: "Return" },
-  { code: "6754", time: "11:00AM", date: "29/05", type: "Sales" },
-  { code: "6754", time: "10:12AM", date: "29/05", type: "Sales" },
-  { code: "6754", time: "10:12AM", date: "29/05", type: "Sales" },
-  { code: "6754", time: "09:20AM", date: "29/05", type: "In stock" },
-  { code: "6754", time: "10:12AM", date: "29/05", type: "Sales" },
-  { code: "6754", time: "02:01PM", date: "29/05", type: "Sales" },
-  { code: "6754", time: "01:40PM", date: "29/05", type: "Return" },
-  { code: "6754", time: "10:12AM", date: "29/05", type: "Sales" },
+const columns: Column<Transaction>[] = [
+  {
+    key: "code",
+    header: "Code",
+    className: "w-20",
+  },
+  {
+    key: "doc_time",
+    header: "Time",
+    render: (value: number) => formatTimeTo12Hour(value),
+    className: "w-24",
+  },
+  {
+    key: "doc_date",
+    header: "Date",
+    render: (value: string) => format(new Date(value?.split("T")[0]), "dd/MM"),
+    className: "w-24",
+  },
+  {
+    key: "doc_type",
+    header: "Type",
+    render: (value: string) => <TypeBadge type={value} />,
+    className: "w-32",
+  },
 ];
 const DocumentsList = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("all");
-
+  const { activeTab, setActiveTab } = useFilterContext();
+  const handleFilterTabChange = (tabKey: string) => {
+    setActiveTab(tabKey);
+  };
   const {
     currentPage,
+    setTotalPages,
     totalPages,
     searchTerm,
     setSearchTerm,
     setCurrentPage,
   } = useTable();
 
-  const columns: Column<Document>[] = [
-    {
-      key: "code",
-      header: "Code",
-      className: "w-20",
-    },
-    {
-      key: "time",
-      header: "Time",
-      className: "w-24",
-    },
-    {
-      key: "date",
-      header: "Date",
-      className: "w-24",
-    },
-    {
-      key: "type",
-      header: "Type",
-      render: (value) => <TypeBadge type={value} />,
-      className: "w-32",
-    },
-  ];
+  const {
+    data: documentsList,
+    isFetching,
+    isError,
+    error,
+  } = useQuery(
+    getDocumentQueryOptions(searchTerm, activeTab, currentPage, setTotalPages)
+  );
 
   const filterTabs: FilterTab[] = [
-    { key: "all", label: "All", isActive: activeTab === "all" },
-    { key: "stock", label: "In/Out stock", isActive: activeTab === "stock" },
+    { key: "", label: "All", isActive: activeTab === "" },
+    { key: "in_stock", label: "In stock", isActive: activeTab === "in_stock" },
+    {
+      key: "out_stock",
+      label: "Out stock",
+      isActive: activeTab === "out_stock",
+    },
     { key: "sales", label: "Sales", isActive: activeTab === "sales" },
-    { key: "returns", label: "Returns", isActive: activeTab === "returns" },
+    { key: "return", label: "Returns", isActive: activeTab === "return" },
     {
       key: "withdraw",
       label: "Withdraw cash",
@@ -80,9 +81,12 @@ const DocumentsList = () => {
     },
   ];
 
-
-  const handleRowClick = (document: Document) => {
-    navigate(`/yanabea/documents/details/${document.code}`);
+  const handleRowClick = (document: Transaction) => {
+    navigate(
+      `/yanabea/documents/details/${
+        activeTab === "" ? filterTypes[document.doc_type] : activeTab
+      }/${document.code}`
+    );
   };
 
   return (
@@ -91,11 +95,15 @@ const DocumentsList = () => {
       onSearchChange={setSearchTerm}
       searchPlaceholder="Search documents"
       filterTabs={filterTabs}
-      onFilterTabChange={setActiveTab}>
+      onFilterTabChange={handleFilterTabChange}>
       <DataTable
         className="h-[calc(100dvh-16.625rem)]"
-        data={documents}
+        data={documentsList || []}
+        isLoading={isFetching}
+        isError={isError}
+        error={error}
         columns={columns}
+        paging
         onRowClick={handleRowClick}
         currentPage={currentPage}
         totalPages={totalPages}

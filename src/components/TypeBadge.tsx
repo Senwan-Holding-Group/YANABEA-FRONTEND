@@ -14,6 +14,8 @@ const TypeBadge: React.FC<TypeBadgeProps> = ({ type, className = "" }) => {
         return 'bg-Primary-50 text-Primary-500 ';
       case 'sales':
         return 'bg-Success-50 text-Success-500 ';
+      case 'sale':
+        return 'bg-Success-50 text-Success-500 ';
       case 'return':
         return 'bg-Error-50 text-Error-500 ';
       case 'in stock':

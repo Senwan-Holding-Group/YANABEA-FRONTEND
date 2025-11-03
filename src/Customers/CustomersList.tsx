@@ -7,170 +7,65 @@ import {
   useTable,
   type Column,
 } from "@/components";
+import type { TCustomersList } from "@/lib/types";
+import { useQuery } from "@tanstack/react-query";
+import { getCutomersQueryOptions } from "@/api/query";
 
-type Customer = {
-  id: string;
-  approvalStatus: "New" | "Approved" | "Rejected";
-  nameEnglish: string;
-  nameArabic: string;
-  status: "Active" | "Inactive";
-};
 
+
+const columns: Column<TCustomersList>[] = [
+  {
+    key: "customer_code",
+    header: "Customer ID",
+    className: "w-20",
+  },
+  {
+    key: "aproval_status",
+    header: "Approval status",
+    render: (value) => <ApprovalStatusBadge status={value} />,
+    className: "w-20",
+  },
+  {
+    key: "customer_eng_name",
+    header: "Name (English)",
+    className: "w-20",
+  },
+  {
+    key: "customer_name",
+    header: "Name (Arabic)",
+    className: "w-20",
+  },
+  {
+    key: "status",
+    header: "Status",
+    render: (value) => <StatusBadge status={value} />,
+    className: "w-24 ",
+  },
+];
 const CustomersList = () => {
   const navigate = useNavigate();
-
-  const customers: Customer[] = [
-    {
-      id: "6754",
-      approvalStatus: "New",
-      nameEnglish: "Malik Alassawi",
-      nameArabic: "مالك الأساوي",
-      status: "Active",
-    },
-    {
-      id: "6754",
-      approvalStatus: "New",
-      nameEnglish: "Abdelrahman Abdry",
-      nameArabic: "عبد الرحمن البدري",
-      status: "Active",
-    },
-    {
-      id: "6754",
-      approvalStatus: "Approved",
-      nameEnglish: "Lina Orfi",
-      nameArabic: "لينة العرفي",
-      status: "Inactive",
-    },
-    {
-      id: "6754",
-      approvalStatus: "New",
-      nameEnglish: "Haneen Elshagasbi",
-      nameArabic: "حنين الشقاصبي",
-      status: "Active",
-    },
-    {
-      id: "6754",
-      approvalStatus: "New",
-      nameEnglish: "Malik Alassawi",
-      nameArabic: "مالك الأساوي",
-      status: "Active",
-    },
-    {
-      id: "6754",
-      approvalStatus: "New",
-      nameEnglish: "Abdelrahman Abdry",
-      nameArabic: "عبد الرحمن البدري",
-      status: "Active",
-    },
-    {
-      id: "6754",
-      approvalStatus: "Approved",
-      nameEnglish: "Lina Orfi",
-      nameArabic: "لينة العرفي",
-      status: "Active",
-    },
-    {
-      id: "6754",
-      approvalStatus: "Approved",
-      nameEnglish: "Haneen Elshagasbi",
-      nameArabic: "حنين الشقاصبي",
-      status: "Active",
-    },
-    {
-      id: "6754",
-      approvalStatus: "Approved",
-      nameEnglish: "Malik Alassawi",
-      nameArabic: "مالك الأساوي",
-      status: "Active",
-    },
-    {
-      id: "6754",
-      approvalStatus: "Rejected",
-      nameEnglish: "Abdelrahman Abdry",
-      nameArabic: "عبد الرحمن البدري",
-      status: "Active",
-    },
-    {
-      id: "6754",
-      approvalStatus: "Approved",
-      nameEnglish: "Lina Orfi",
-      nameArabic: "لينة العرفي",
-      status: "Active",
-    },
-    {
-      id: "6754",
-      approvalStatus: "Approved",
-      nameEnglish: "Haneen Elshagasbi",
-      nameArabic: "حنين الشقاصبي",
-      status: "Active",
-    },
-    {
-      id: "6754",
-      approvalStatus: "Approved",
-      nameEnglish: "Abdelrahman Abdry",
-      nameArabic: "مالك الأساوي",
-      status: "Inactive",
-    },
-    {
-      id: "6754",
-      approvalStatus: "Approved",
-      nameEnglish: "Lina Orfi",
-      nameArabic: "عبد الرحمن البدري",
-      status: "Active",
-    },
-    {
-      id: "6754",
-      approvalStatus: "Rejected",
-      nameEnglish: "Haneen Elshagasbi",
-      nameArabic: "لينة العرفي",
-      status: "Active",
-    },
-  ];
-
   const {
     currentPage,
     totalPages,
+    setTotalPages,
     searchTerm,
     setSearchTerm,
     setCurrentPage,
   } = useTable();
-
-  const columns: Column<Customer>[] = [
-    {
-      key: "id",
-      header: "Customer ID",
-      className: "w-20",
-    },
-    {
-      key: "approvalStatus",
-      header: "Approval status",
-      render: (value) => <ApprovalStatusBadge status={value} />,
-      className: "w-20",
-    },
-    {
-      key: "nameEnglish",
-      header: "Name (English)",
-      className: "w-20",
-    },
-    {
-      key: "nameArabic",
-      header: "Name (Arabic)",
-      className: "w-20 text-right",
-    },
-    {
-      key: "status",
-      header: "Status",
-      render: (value) => <StatusBadge status={value} />,
-      className: "w-24 ",
-    },
-  ];
+  const {
+    data: customersList,
+    isFetching,
+    isError,
+    error,
+  } = useQuery(
+    getCutomersQueryOptions(searchTerm, currentPage, setTotalPages)
+  );
 
   const handleCreateCustomer = () => {
-    navigate("/yanabea/customers/create");
   };
 
-  const handleRowClick = (customer: Customer) => {
-    navigate(`/yanabea/customers/details/${customer.id}`);
+  const handleRowClick = (customer: TCustomersList) => {
+    navigate(`/yanabea/customers/details/${customer.customer_code}`);
   };
 
   return (
@@ -182,9 +77,13 @@ const CustomersList = () => {
       createButtonLabel="Create customer">
       <DataTable
         className="h-[calc(100dvh-13.625rem)]"
-        data={customers}
+        data={customersList || []}
+        isLoading={isFetching}
+        isError={isError}
+        error={error}
         columns={columns}
         onRowClick={handleRowClick}
+        paging
         currentPage={currentPage}
         totalPages={totalPages}
         onPageChange={setCurrentPage}

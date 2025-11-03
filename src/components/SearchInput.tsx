@@ -25,9 +25,7 @@ const SearchInput = ({
           type="text"
           placeholder={placeholder}
           value={value}
-          onChange={(e) => {
-            onChange(e.currentTarget.value);
-          }}
+          onChange={(e) => onChange(e.target.value)}
           className="pr-16 rounded-xl"
         />
         {value && (

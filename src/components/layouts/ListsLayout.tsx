@@ -57,7 +57,7 @@ const ListsLayout = ({
                   key={tab.key}
                   size="sm"
                   onClick={() => onFilterTabChange?.(tab.key)}
-                  className={`rounded-full px-4 py-2 hover:bg-[#F5ECDD]/75 cursor-pointer bg-[#F5ECDD] shadow-CS text-base${
+                  className={`rounded-full px-4 py-2 hover:bg-Secondary-50/75 cursor-pointer bg-Secondary-50 shadow-CS text-base${
                     tab.isActive
                       ? " text-Primary-500 border border-Primary-500"
                       : " text-Primary-400  "

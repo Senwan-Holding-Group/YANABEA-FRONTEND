@@ -1,12 +1,9 @@
-import { Outlet, useLocation } from "react-router";
+import { Outlet } from "react-router";
 import Navbar from "./components/Navbar";
-import { navItems } from "./lib/constants";
+import { useCurrentNavItem } from "./hooks/useCurrentNavItem";
 
 const App = () => {
-  const location = useLocation();
-   const currentItem = navItems[0].items.find(
-    (item) => location.pathname.includes(item.path)
-  );  
+  const currentItem = useCurrentNavItem();  
   return (
     <div className="font-Afacad bg-Primary-25 h-dvh w-screen">
       <Navbar />

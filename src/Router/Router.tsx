@@ -1,8 +1,4 @@
-import {
-  createBrowserRouter,
-  Navigate,
-  RouterProvider,
-} from "react-router";
+import { createBrowserRouter, Navigate, RouterProvider } from "react-router";
 import App from "../App";
 import NotFound from "@/components/Notfound";
 import Dashboard from "@/Dashboard/Dashboard";
@@ -13,6 +9,10 @@ import CustomersList from "@/Customers/CustomersList";
 import CustomerDetails from "@/Customers/CustomerDetails";
 import DocumentsList from "@/Documents/DocumentsList";
 import DocumentDetails from "@/Documents/DocumentDetails";
+import LoginPage from "@/Login/LoginPage";
+import ProtectedRoute from "./ProtectedRoute";
+import FilterProvider from "@/contexts/Filter/FilterProvider";
+import UserProvider from "@/contexts/User/UserProvider";
 
 const router = createBrowserRouter([
   {
@@ -31,33 +31,74 @@ const router = createBrowserRouter([
       },
       {
         path: "dashboard",
-        element: <Dashboard />,
+        element: (
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "users",
-        element: <UsersList />,
+        element: (
+          <ProtectedRoute>
+            <UserProvider>
+              <UsersList />
+            </UserProvider>
+          </ProtectedRoute>
+        ),
       },
       {
         path: "users/details/:id",
-        element: <UserDetails />,
+        element: (
+          <ProtectedRoute>
+            <UserProvider>
+              <UserDetails />
+            </UserProvider>
+          </ProtectedRoute>
+        ),
       },
       {
         path: "customers",
-        element: <CustomersList   />,
+        element: (
+          <ProtectedRoute>
+            <CustomersList />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "customers/details/:id",
-        element: <CustomerDetails />,
+        element: (
+          <ProtectedRoute>
+            <CustomerDetails />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "documents",
-        element: <DocumentsList   />,
+        element: (
+          <ProtectedRoute>
+            <FilterProvider>
+              <DocumentsList />
+            </FilterProvider>
+          </ProtectedRoute>
+        ),
       },
       {
-        path: "documents/details/:id",  
-        element: <DocumentDetails />,
+        path: "documents/details/:filter/:id",
+        element: (
+          <ProtectedRoute>
+            <FilterProvider>
+              <DocumentDetails />
+            </FilterProvider>
+          </ProtectedRoute>
+        ),
       },
     ],
+  },
+  {
+    path: "/login",
+    errorElement: <NotFound />,
+    element: <LoginPage />,
   },
 ]);
 
