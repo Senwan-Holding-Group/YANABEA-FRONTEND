@@ -139,7 +139,7 @@ const TransactionDialog = ({ code, filter, type }: TransactionDialogProps) => {
               {type != "Withdraw" ? (
                 <>
                   <DataTable
-                    className="h-[calc(24.125rem-12.75rem)]"
+                    className="h-[9.813rem]"
                     columns={columns}
                     data={transactionDetails.doc_lines || []}
                     paging={false}

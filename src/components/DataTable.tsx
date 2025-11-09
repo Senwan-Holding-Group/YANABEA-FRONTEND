@@ -23,6 +23,7 @@ type DataTableProps<T> = {
   className?: string;
   emptyMessage?: string;
   paging: boolean;
+   getRowClassName?: (item: T) => string
 };
 
 function DataTable<T extends Record<string, any>>({
@@ -38,6 +39,7 @@ function DataTable<T extends Record<string, any>>({
   className = "",
   paging,
   emptyMessage = "No data available",
+  getRowClassName
 }: DataTableProps<T>) {
   return (
     <div className={`${className}  bg-white `}>
@@ -73,7 +75,7 @@ function DataTable<T extends Record<string, any>>({
                   <tr
                     key={index}
                     onClick={() => onRowClick?.(row)}
-                    className={`border-b text-nowrap border-Primary-50 hover:bg-Primary-5 transition-colors cursor-pointer`}>
+                    className={`border-b text-nowrap border-Primary-50 hover:bg-Primary-5 transition-colors cursor-pointer ${getRowClassName?.(row)}`}>
                     {columns.map((column,index) => (
                       <td
                         key={index}

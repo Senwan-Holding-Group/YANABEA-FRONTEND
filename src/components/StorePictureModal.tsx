@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -13,23 +13,31 @@ import ConfirmationModal from "@/components/ConfirmationModal";
 import SuccessModal from "@/components/SuccessModal";
 interface StorePictureModalProps {
   isOpen: boolean;
+  isEdit: boolean;
   onClose: () => void;
   onSave: (file: File, onProgress?: (progress: number) => void) => Promise<void>;
-  currentImageUrl?: string;
+  currentImageUrl: string;
 }
 
 const StorePictureModal = ({
   isOpen,
+  isEdit,
   onClose,
   onSave,
   currentImageUrl,
 }: StorePictureModalProps) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState(currentImageUrl || "");
+  const [previewUrl, setPreviewUrl] = useState<string>("");
   const [isUploading, setIsUploading] = useState(false);
+  
   const [uploadProgress, setUploadProgress] = useState(0);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  useEffect(() => {
+    if (isOpen && currentImageUrl) {
+      setPreviewUrl(currentImageUrl);
+    }
+  }, [isOpen, currentImageUrl]); 
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -41,7 +49,7 @@ const StorePictureModal = ({
   };
   const handleReset = () => {
     setSelectedFile(null);
-    setPreviewUrl("" );
+    setPreviewUrl("");
   }
   const handleSave = () => {
     if (selectedFile && !isUploading) {
@@ -129,14 +137,14 @@ const StorePictureModal = ({
             type="button"
             variant="outline"
             onClick={handleReset}
-            disabled={isUploading}
+            disabled={isUploading || !isEdit}
             className="flex-1 border-Primary-200 text-Primary-500 hover:bg-Primary-50 rounded-xl disabled:opacity-50">
             Reset
           </Button>
           <Button
             type="button"
             onClick={handleSave}
-            disabled={!selectedFile || isUploading || !!previewUrl && !selectedFile}
+            disabled={!selectedFile || isUploading || !!previewUrl && !selectedFile || !isEdit}
             className="flex-1 bg-Primary-500 hover:bg-Primary-600 text-white rounded-xl disabled:opacity-50">
             {isUploading ? 'Uploading...' : 'Save'}
           </Button>
@@ -158,6 +166,7 @@ const StorePictureModal = ({
       isOpen={showSuccess}
       onClose={handleSuccessClose}
       message="Image uploaded successfully!"
+      type="Success"
     />
   </>)
 };

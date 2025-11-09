@@ -7,7 +7,7 @@ type ApprovalStatusBadgeProps = {
 
 const ApprovalStatusBadge: React.FC<ApprovalStatusBadgeProps> = ({ status, className = "" }) => {
   const getStatusStyles = (status: string) => {
-    switch (status.toLowerCase()) {
+    switch (status?.toLowerCase()) {
       case 'new':
         return 'bg-Primary-50 text-Primary-500' ;
       case 'approved':

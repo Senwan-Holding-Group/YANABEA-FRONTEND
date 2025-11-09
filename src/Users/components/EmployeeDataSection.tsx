@@ -8,6 +8,7 @@ import {
   getUserDetailsQueryOptions,
 } from "@/api/query";
 import DataRenderer from "@/components/DataRenderer";
+import AdministrativeDataSkeleton from "@/components/skeletons/AdministrativeDataSkeleton";
 
 const EmployeeDataSection = () => {
   const { id } = useParams();
@@ -21,6 +22,7 @@ const EmployeeDataSection = () => {
   const administrativeData = useQuery(
     getAdministrativeDataQueryOptions("employee", id)
   );
+
   return (
     <div className="space-y-8">
       <DataRenderer isLoading={isFetching} isError={isError} error={error}>
@@ -71,46 +73,50 @@ const EmployeeDataSection = () => {
           className="border-Primary-200 w-full text-Primary-500 hover:bg-Primary-50 rounded-xl">
           Edite employee data
         </Button>
-        {userType === "F" && <CurrentTreasurySection />}
-        <div className=" space-y-4 w-80">
-          <h3 className="text-lg font-semibold text-Primary-500  ">
-            Administrative data
-          </h3>
-          <div className="*:h-10 **:px-2 **:py-4">
-            <div className="flex items-center ">
-              <span className="text-Primary-500 font-medium w-24">
-                Created by
-              </span>
-              <span className="text-Primary-500 ">
-                {administrativeData.data?.created_by}
-              </span>
-            </div>
-            <div className="flex items-center ">
-              <span className="text-Primary-500 font-medium w-24">
-                Created on
-              </span>
-              <span className="text-Primary-500">
-                {administrativeData.data?.created_on?.split("T")[0]}
-              </span>
-            </div>
-            <div className="flex items-center ">
-              <span className="text-Primary-500 font-medium w-24">
-                Edited by
-              </span>
-              <span className="text-Primary-500">
-                {administrativeData.data?.edited_by}
-              </span>
-            </div>
-            <div className="flex items-center ">
-              <span className="text-Primary-500 font-medium w-24">
-                Edited on
-              </span>
-              <span className="text-Primary-500">
-                {administrativeData.data?.edited_on?.split("T")[0]}
-              </span>
+        {userType === "FS" && <CurrentTreasurySection />}
+        {administrativeData.isFetching ? (
+          <AdministrativeDataSkeleton />
+        ) : (
+          <div className=" space-y-4 w-80">
+            <h3 className="text-lg font-semibold text-Primary-500  ">
+              Administrative data
+            </h3>
+            <div className="*:h-10 **:px-2 **:py-4">
+              <div className="flex items-center ">
+                <span className="text-Primary-500 font-medium w-24">
+                  Created by
+                </span>
+                <span className="text-Primary-500 ">
+                  {administrativeData.data?.created_by}
+                </span>
+              </div>
+              <div className="flex items-center ">
+                <span className="text-Primary-500 font-medium w-24">
+                  Created on
+                </span>
+                <span className="text-Primary-500">
+                  {administrativeData.data?.created_on?.split("T")[0]}
+                </span>
+              </div>
+              <div className="flex items-center ">
+                <span className="text-Primary-500 font-medium w-24">
+                  Edited by
+                </span>
+                <span className="text-Primary-500">
+                  {administrativeData.data?.edited_by}
+                </span>
+              </div>
+              <div className="flex items-center ">
+                <span className="text-Primary-500 font-medium w-24">
+                  Edited on
+                </span>
+                <span className="text-Primary-500">
+                  {administrativeData.data?.edited_on?.split("T")[0]}
+                </span>
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </DataRenderer>
     </div>
   );

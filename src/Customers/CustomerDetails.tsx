@@ -1,5 +1,5 @@
 import DetailsLayout from "@/components/layouts/DetailsLayout";
-import CustomerDataSection from "@/Users/components/CustomerDataSection";
+import CustomerDataSection from "@/Customers/components/CustomerDataSection";
 import TransactionsHistorySection from "@/Users/components/TransactionsHistorySection";
 import { useParams } from "react-router";
 

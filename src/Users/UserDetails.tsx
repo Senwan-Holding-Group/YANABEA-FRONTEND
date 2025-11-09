@@ -59,8 +59,7 @@ const UserDetails = () => {
             </div>
           </div>
         );
-
-      case "F":
+      case "FS":
         return (
           <div className="flex lg:flex-row flex-col lg:h-full gap-6">
             <div className="border lg:w-1/3 overflow-y-scroll border-Primary-25 shadow-CS px-6 py-4 rounded-xl">

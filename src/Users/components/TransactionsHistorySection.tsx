@@ -120,7 +120,7 @@ const TransactionsHistorySection = ({
         <CFilterTab filterTabs={filterTabs} onFilterTabChange={setFilterTab} />
       </div>
 
-      <div className="h-[15.5rem] 3xl:h-[29rem] overflow-auto ">
+      <div className="h-[15.5rem]  lg:h-[29rem]  overflow-auto ">
         <DataTable
           data={transactions || []}
           className="h-full"

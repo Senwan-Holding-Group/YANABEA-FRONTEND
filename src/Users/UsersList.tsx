@@ -73,10 +73,7 @@ const UsersList = () => {
   const { userType,setUserType,isAdmin } = useUserContext()
   const columns = getColumns(userType);
 
-  const handleFilterTabChange = (tabKey: string) => {
-    setUserType(tabKey);
-  };
-
+  
   const {
     currentPage,
     totalPages,
@@ -85,6 +82,10 @@ const UsersList = () => {
     setSearchTerm,
     setCurrentPage,
   } = useTable();
+  const handleFilterTabChange = (tabKey: string) => {
+    setUserType(tabKey);
+    setCurrentPage(1)
+  };
   const {
     data: usersList,
     isFetching,

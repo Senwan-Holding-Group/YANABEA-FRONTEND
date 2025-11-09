@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -12,18 +12,27 @@ interface StoreLocationModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (location: { lat: number; lng: number }) => void;
-  initialLocation?: { lat: number; lng: number };
+  location?: string | null;
 }
 
 const StoreLocationModal = ({
   isOpen,
   onClose,
   onSave,
-  initialLocation,
+  location,
 }: StoreLocationModalProps) => {
-  const [selectedLocation, setSelectedLocation] = useState(
-    initialLocation || { lat: 32.8872, lng: 13.1913 }
-  );
+  const defaultLocation = { lat: 32.09519971952656, lng: 20.082130993652353 };
+  const parseLocation = (locationStr: string | null | undefined) => {
+    if (!locationStr) return defaultLocation;
+    const [lat, lng] = locationStr.split(',').map(coord => parseFloat(coord.trim()));
+    return isNaN(lat) || isNaN(lng) ? defaultLocation : { lat, lng };
+  };
+
+  const [selectedLocation, setSelectedLocation] = useState(parseLocation(location));
+
+  useEffect(() => {
+    setSelectedLocation(parseLocation(location));
+  }, [location]);
 
 
   const { isLoaded } = useJsApiLoader({
@@ -32,7 +41,7 @@ const StoreLocationModal = ({
   });
 
   const handleReset = () => {
-    setSelectedLocation(initialLocation || { lat: 32.8872, lng: 13.1913 });
+    setSelectedLocation(parseLocation(location));
   };
 
   const handleSave = () => {

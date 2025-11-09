@@ -17,8 +17,13 @@ const Navbar = () => {
               .filter(
                 (item) =>
                   !(
-                    user?.user_type === "W" &&
-                    (item.navLabel === "Users" || item.navLabel === "Customers")
+                    (user?.user_type === "W" &&
+                      (item.navLabel === "Users" ||
+                        item.navLabel === "Customers")) ||
+                    (user?.user_type === "F" &&
+                      (item.navLabel === "Users" ||
+                        item.navLabel === "Customers")) ||
+                    (user?.user_type === "FS" && item.navLabel === "Customers")
                   )
               )
               .map((item) => (

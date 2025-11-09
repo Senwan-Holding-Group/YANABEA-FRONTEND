@@ -29,12 +29,16 @@ import StorePictureModal from "@/components/StorePictureModal";
 import { faSpinner } from "@fortawesome/pro-regular-svg-icons";
 import { imageUpload } from "@/api/imageUpload";
 import { baseURL } from "@/api";
+import AdministrativeDataSkeleton from "@/components/skeletons/AdministrativeDataSkeleton";
+import SuccessModal from "@/components/SuccessModal";
+import { getApiError } from "@/lib/utils";
 
 const CustomerDataSection = () => {
   const { id } = useParams();
   const [isEdit, setisEdit] = useState(false);
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
   const [isPictureModalOpen, setIsPictureModalOpen] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const form = useForm<EditCustomerRequest>({
     resolver: zodResolver(EditCustomerSchema),
@@ -63,16 +67,26 @@ const CustomerDataSection = () => {
         CardForeignName: customerDetails.customer_eng_name,
         CardName: customerDetails.customer_name,
         Cellular: customerDetails.phone_no,
-        U_Location: customerDetails.location || "West",
-        U_img_url:
-          customerDetails.img_url ||
-          "http://10.10.0.230:8099/uploads/PRO01---26-10-2025-13-50-00.png",
+        U_Location: customerDetails.location || "",
+        U_img_url: customerDetails.img_url || "",
       });
     }
   }, [form, customerDetails]);
-  const { mutate: editCustomer, isPending } = useUpdateCustomer(id);
+  const {
+    mutate: editCustomer,
+    isPending,
+    isError: isEditError,
+    error: editError,
+  } = useUpdateCustomer(id);
   const onSubmit = async (values: EditCustomerRequest) => {
-    editCustomer(values);
+    editCustomer(values, {
+      onSettled: () => {
+        setShowSuccess(true);
+      },
+    });
+  };
+  const handleSuccessClose = () => {
+    setShowSuccess(false);
   };
   return (
     <Form {...form}>
@@ -158,9 +172,11 @@ const CustomerDataSection = () => {
             <div className="space-y-2">
               <div
                 onClick={() => setIsPictureModalOpen(true)}
-                className="flex items-center gap-2 text-Primary-500 cursor-pointer w-[20rem] hover:text-Primary-600">
-                <FontAwesomeIcon icon={faCamera} className="size-4" />
-                <span className="font-medium">View store's picture</span>
+                className="flex flex-col  gap-2 text-Primary-500 cursor-pointer w-[20rem] hover:text-Primary-600">
+                <div className="flex gap-2 items-center">
+                  <FontAwesomeIcon icon={faCamera} className="size-4" />
+                  <span className="font-medium">View store's picture</span>
+                </div>
                 <FormField
                   control={form.control}
                   name="U_img_url"
@@ -173,9 +189,11 @@ const CustomerDataSection = () => {
               </div>
               <div
                 onClick={() => setIsLocationModalOpen(true)}
-                className="flex items-center w-[20rem] gap-2 text-Primary-500 cursor-pointer ">
-                <FontAwesomeIcon icon={faMapMarkerAlt} className="size-4" />
-                <span className="font-medium">View store's location</span>
+                className="flex flex-col w-[20rem] gap-2 text-Primary-500 cursor-pointer ">
+                <div className="flex gap-2 items-center">
+                  <FontAwesomeIcon icon={faMapMarkerAlt} className="size-4" />
+                  <span className="font-medium">View store's location</span>
+                </div>
                 <FormField
                   control={form.control}
                   name="U_Location"
@@ -201,7 +219,7 @@ const CustomerDataSection = () => {
                   }
                 }}
                 className="border-Primary-100 w-80 text-Primary-500 hover:bg-Primary-50 rounded-xl font-semibold leading-[100%]">
-                Edit employee data
+                Edit Customer data
               </Button>
             ) : (
               <div className="flex gap-2">
@@ -227,26 +245,41 @@ const CustomerDataSection = () => {
               </div>
             )}
           </div>
-
-          <div className="space-y-4  w-80">
-            <h3 className="text-lg font-semibold text-Primary-500">
-              Administrative data
-            </h3>
-            <div className="*:h-10">
-              <div className="flex items-center gap-x-8">
-                <span className="text-Primary-500 font-medium">Created by</span>
-                <span className="text-Primary-500">{administrativeData.data?.created_by}</span>
-              </div>
-              <div className="flex items-center gap-x-8">
-                <span className="text-Primary-500 font-medium">Created on</span>
-                <span className="text-Primary-500">{administrativeData.data?.created_on?.split("T")[0]}</span>
-              </div>
-              <div className="flex items-center gap-x-8">
-                <span className="text-Primary-500 font-medium">Edited by</span>
-                <span className="text-Primary-500">{administrativeData.data?.edited_by}</span>
+          {administrativeData.isFetching ? (
+            <AdministrativeDataSkeleton />
+          ) : (
+            <div className="space-y-4  w-80">
+              <h3 className="text-lg font-semibold text-Primary-500">
+                Administrative data
+              </h3>
+              <div className="*:h-10 **:px-2 **:py-4">
+                <div className="flex items-center gap-x-8">
+                  <span className="text-Primary-500 font-medium w-24">
+                    Created by
+                  </span>
+                  <span className="text-Primary-500">
+                    {administrativeData.data?.created_by}
+                  </span>
+                </div>
+                <div className="flex items-center gap-x-8">
+                  <span className="text-Primary-500 font-medium w-24">
+                    Created on
+                  </span>
+                  <span className="text-Primary-500">
+                    {administrativeData.data?.created_on?.split("T")[0]}
+                  </span>
+                </div>
+                <div className="flex items-center gap-x-8">
+                  <span className="text-Primary-500 font-medium w-24">
+                    Edited by
+                  </span>
+                  <span className="text-Primary-500">
+                    {administrativeData.data?.edited_by}
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </DataRenderer>
 
         <StoreLocationModal
@@ -255,26 +288,27 @@ const CustomerDataSection = () => {
           onSave={(location) => {
             form.setValue("U_Location", `${location.lat},${location.lng}`);
           }}
-          initialLocation={
-            customerDetails?.location
-              ? {
-                  lat: parseFloat(customerDetails.location.split(",")[0]),
-                  lng: parseFloat(customerDetails.location.split(",")[1]),
-                }
-              : undefined
-          }
+          location={form.getValues("U_Location")}
         />
         <StorePictureModal
           isOpen={isPictureModalOpen}
+          isEdit={isEdit}
           onClose={() => setIsPictureModalOpen(false)}
           onSave={async (file, onProgress) => {
             const img_url = await imageUpload(file, onProgress);
             form.setValue("U_img_url", baseURL + img_url);
           }}
-          currentImageUrl={
-            customerDetails?.img_url ||
-            "http://10.10.0.230:8099/uploads/PRO01---26-10-2025-13-50-00.png"
+          currentImageUrl={form.getValues("U_img_url")}
+        />
+        <SuccessModal
+          isOpen={showSuccess}
+          onClose={handleSuccessClose}
+          message={
+            isEditError
+              ? getApiError(editError)
+              : "The customer is successfully Updated"
           }
+          type={isEditError ? "Error" : "Success"}
         />
       </form>
     </Form>

@@ -9,7 +9,9 @@ export type TUsersList = {
   finance_person_code?: number;
   finance_person_name?: string;
   status: boolean;
+  abs_entry: number;
   user_code: string;
+  current_total:number
 };
 export type TUserDetails = {
   sales_person_code?: number;
@@ -103,4 +105,80 @@ export type AdministrativeData = {
   created_on: string;
   edited_by: string;
   edited_on: string;
+};
+export type TopSellingItem = {
+  item_code: string;
+  item_name: string;
+  total_sales: number;
+};
+export type HighestPurCustomer = {
+  customer_code: string;
+  customer_name: string;
+  total_purchases: number;
+};
+export type HighestSalesEmployee = {
+  sales_person_code: string;
+  sales_person_name: string;
+  total_sales: number;
+};
+export type ActiveEmployee = {
+  sales_person_code: string;
+  sales_person_name: string;
+  piece_quantity: number;
+  box_quantity: number;
+  current_cash_amount: number;
+};
+export type ActiveEmployeeFinance = {
+  finance_person_code: number;
+  finance_person_name: string;
+  status: boolean;
+  user_code: string;
+  current_cash_ammount: number;
+};
+export type TopItemStocK = {
+  item_code: string;
+  item_name: string;
+  in_quantity: number;
+  out_quantity: number;
+};
+export type TopItemMovement = {
+  item_code: string;
+  item_name: string;
+  in_amount: number;
+  out_amount: number;
+};
+export type CurrentCash = {
+  current_cash_amount: number;
+};
+
+export type Item = {
+  item_code: string;
+  item_name: string;
+  price: number;
+  uom_code: string;
+  quantity: number;
+  uom_entry: number;
+  img_url: string;
+  line: number;
+};
+
+export type CreateTransferPayload = {
+  FromWarehouse: string;
+  ToWarehouse: string;
+  SalesPersonCode: number;
+  StockTransferLines: {
+    ItemCode: string;
+    ItemDescription: string;
+    Quantity: number;
+    FromWarehouseCode: string;
+    WarehouseCode: string;
+    UnitPrice: number;
+    UoMEntry: number;
+    UoMCode: string;
+    StockTransferLinesBinAllocations: {
+      BinAbsEntry: number | undefined;
+      Quantity: number;
+      BinActionType: string;
+    }[];
+  }[];
 };

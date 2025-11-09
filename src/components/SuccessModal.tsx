@@ -1,46 +1,39 @@
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
+
 } from "@/components/ui/dialog";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheckCircle } from "@fortawesome/pro-light-svg-icons";
+import {
+  faCircleCheck,
+  faCircleXmark,
+} from "@fortawesome/pro-regular-svg-icons";
 
 interface SuccessModalProps {
   isOpen: boolean;
   onClose: () => void;
-  title?: string;
-  message: string;
+  message: string|undefined;
+  type: "Success" | "Error";
 }
 
 const SuccessModal = ({
   isOpen,
   onClose,
-  title = "Success",
+  type,
   message,
 }: SuccessModalProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md px-4 pt-6 pb-8">
-        <DialogHeader className="mb-4">
-          <DialogTitle className="text-Primary-500 flex items-center gap-2">
-            <FontAwesomeIcon icon={faCheckCircle} className="text-green-500" />
-            {title}
-          </DialogTitle>
-        </DialogHeader>
+      <DialogContent className="max-w-[34.25rem] h-[15.688rem] flex items-end  px-4 pt-4 pb-12 rounded-xl">
+        <div className="flex flex-col items-center w-full mt-4 h-[9.188rem] gap-4">
 
-        <div className="mb-6">
-          <p className="text-Primary-400">{message}</p>
+        {type === "Success" ? (
+          <FontAwesomeIcon size="5x" icon={faCircleCheck} className="text-Success-100" />
+        ) : (
+          <FontAwesomeIcon size="5x" icon={faCircleXmark} className="text-Error-100" />
+        )}
+        <p className="text-Black font-semibold  text-lg overflow-scroll ">{message}</p>
         </div>
-
-        <Button
-          type="button"
-          onClick={onClose}
-          className="w-full bg-Primary-500 hover:bg-Primary-600 text-white rounded-xl">
-          OK
-        </Button>
       </DialogContent>
     </Dialog>
   );

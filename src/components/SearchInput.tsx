@@ -6,6 +6,7 @@ type SearchInputProps = {
   onChange: (value: string) => void;
   placeholder?: string;
   className?: string;
+  enable?: boolean;
 };
 
 const SearchInput = ({
@@ -13,6 +14,7 @@ const SearchInput = ({
   onChange,
   placeholder = "Search",
   className = "",
+  enable=true
 }: SearchInputProps) => {
   const handleClear = () => {
     onChange("");
@@ -40,12 +42,12 @@ const SearchInput = ({
         )}
       </div>
 
-      <Button
+      {enable &&<Button
         type="button"
         variant="outline"
         className="whitespace-nowrap rounded-xl border border-Primary-100 text-Primary-500">
         Search by ID
-      </Button>
+      </Button>}
     </div>
   );
 };
